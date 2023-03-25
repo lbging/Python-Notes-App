@@ -4,15 +4,20 @@ import sqlite3
 
 class Actions:
 
+    def __init__(self):
+        self.connection = sqlite3.connect('Python1.db')
+        self.cursor = self.connection.cursor()
+
     def register(self):
         print("Register Form")
 
-        name = input("What's your name?: ")
-        lastname = input("What's your last name?: ")
-        mail = input("What's your email?: ")
-        password = input("Type in your password: ")
+        user = model.user('','','','')
 
-        user = model.user(name, lastname, mail, password)
+        user.name = input("What's your name?: ")
+        user.lastname = input("What's your last name?: ")
+        user.mail = input("What's your email?: ")
+        user.password = input("Type in your password: ")
+
         register = user.register()
 
         if register[0]>=1:
@@ -26,27 +31,13 @@ class Actions:
         password = input("Password: ")
 
         user = model.user('', '', mail, password)
-        login = user.login()
+        login = user.login(self.cursor, self.connection)
 
         if mail == login[3]:
             print(f"Welcome {login[1]}!")
-        self.nextFunctions(login)
-
-        try:
-            mail = input("Mail: ")
-            password = input("Password: ")
-
-            user = model.user('', '', mail, password)
-            login = user.login()
-
-            if mail == login[3]:
-                print(f"Welcome {login[1]}!")
             self.nextFunctions(login)
-
-        except Exception as e:
-            print(type(e))
-            print(type(e).__name__)
-            print(f"Wrong credentials.")
+        else:
+            print("Wrong credentials.")
 
     def nextFunctions(self, user):
 
@@ -64,16 +55,14 @@ class Actions:
         doAction = data.functions.Functions()
 
         if func.lower() == "create":
-            doAction.create(user)
+            doAction.create(user, self.cursor, self.connection)
             self.nextFunctions(user)
         elif func.lower() == "show":
-            doAction.show(user)
+            doAction.show(user, self.cursor)
             self.nextFunctions(user)
         elif func.lower() == "delete":
-            doAction.delete(user)
+            doAction.delete(user, self.cursor, self.connection)
             self.nextFunctions(user)
         elif func.lower() == "exit":
             print(f"See you later. Nachito. I mean, {user[1]}.")
             exit()
-            conn.close()
-
